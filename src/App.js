@@ -49,10 +49,11 @@ const App = () => {
   const uploadImage = async (e) => {
     console.log(e.target.files[0]);
 
-    const formData = new formData();
+    const formData = new FormData();
     formData.append("file", e.target.files[0]);
     setModalOpen(true);
     setSelectedImage(e.target.files[0]);
+    e.target.value = null
 
     try {
       const options = {
@@ -62,6 +63,28 @@ const App = () => {
       const response = await fetch("http://localhost:8000/upload", options);
       const data = await response.json();
       console.log(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const generateVariations = async () => {
+    setImages(null);
+    if (selectedImage === null) {
+      setError('Error! Must have ana existing image')
+      setModalOpen(false);
+      return
+    }
+    try {
+      const options = {
+        method: "POST",
+      };
+      const response = await fetch("http://localhost:8000/variations", options);
+      const data = await response.json();
+      console.log(data);
+      setImages(data);
+      setError(null);
+      setModalOpen(false);
     } catch (error) {
       console.error(error);
     }
@@ -105,6 +128,7 @@ const App = () => {
               setModalOpen={setModalOpen}
               setSelectedImage={setSelectedImage}
               selectedImage={selectedImage}
+              generateVariations={generateVariations}
             />
           </div>
         )}
